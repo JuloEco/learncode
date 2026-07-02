@@ -1,0 +1,1072 @@
+{
+    "cours": {
+        "bases": {
+            "titre": "1. Bases",
+            "matiere": "CODE",
+            "contenu": "1. [DEFINITION:Print:Print est une fonction qui affiche du texte]\r\nA quoi sert [TOUCHE:Print] ?\r\n[REVELER:A afficher du texte]\r\n[FLOU:[ASTUCE: A RETENIR : PRINT AFFICHE DU TEXTE]]\r\n[FLOU:[ALERTE:NE PAS OUBLIER ES GUILLEMETS ET LES PARENTHESES]]\r\n\r\n2. [DEFINITION:Input:Input est une fonction, qui, comme print, affiche du texte, ainsi que la donnée que l'utilisateu va entrer dans la console]\r\nA quoi sert  [TOUCHE:Input] ?\r\n[REVELER:A enregistrer une réponse à une question]\r\n[FLOU:[ASTUCE: A RETENIR : INPUT : AFFICHE DU TEXTE + ENREGISTRE LA REPONSE][ALERTE:NE PAS OUBLIER DE STOCKER LE TOUT DANS UNE VARIABLE, DE METTRE DES GUILLEMETS ET DES PARENTHESES]]",
+            "slides": [
+                {
+                    "titre": "Print",
+                    "contenu": "Affiche du texte. \r\nSyntaxe : print(\"texte\")",
+                    "code": "print(\"Hello tout le monde !\")"
+                },
+                {
+                    "titre": "Input",
+                    "contenu": "Input affiche du texte et enregistre ce que tape l'utilisateur. On stocke la réponse dans une variable dans une variable\r\nSyntaxe : variable = input(\"Question\")",
+                    "code": "age = input(\"Quel est ton age ?\")"
+                },
+                {
+                    "titre": "Variables",
+                    "contenu": "Une variable est comme une boite : on peut y stocker une information (texte ou nombre)\r\nSyntaxe : nom = valeur",
+                    "code": "age = 12"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Comment afficher bonjour ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "print(\"bonjour\")",
+                    "is_python": false
+                },
+                {
+                    "q": "Comment enregistrer la reponse de l'utilisateur à la question Quel est ton age ?",
+                    "type": "qcm",
+                    "opts": [
+                        "print(\"Quel est ton âge ?\")",
+                        "input(\"Quel est ton age ?)",
+                        "age = input(\"Quel est ton age ?\")",
+                        "age = print(\"Quel est ton age ?\")"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "A quoi peut on comparer une variable ?",
+                    "type": "qcm",
+                    "opts": [
+                        "Une boite",
+                        "un outil",
+                        "un changement"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Avec quoi transforme t on un nombre en texte ?",
+                    "type": "qcm",
+                    "opts": [
+                        "str",
+                        "int",
+                        "float"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Avec quoi transforme t on un texte en nombre entier ?",
+                    "type": "qcm",
+                    "opts": [
+                        "str",
+                        "int",
+                        "float"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Pourquoi est il utile de stocker une réponse dans une variable ?",
+                    "type": "qcm",
+                    "opts": [
+                        "Parce que c'est comme ça : on ne peut pas utiliser input() sans variables",
+                        " Parce que on peut se servir de cette réponse",
+                        " On peut s'en passer mais c'est conventionnel"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                }
+            ]
+        },
+        "condition": {
+            "titre": "2. Conditions",
+            "matiere": "CODE",
+            "contenu": "1) If\r\nIf est une fonction voulant dire « si…, alors... ». Elle permet de faire une action à une\r\ncondition.\r\nCette condition est après if, et avant « : ». Ensuite, tout ce qui est à la ligne, 4 espaces par\r\nrapport au if, est ce qui se passe si la condition s’avère vraie.\r\nEx : if age == 12 :\r\n(4 espaces ) print(\"Tu as 12 ans\")\r\n2) Elif\r\nElif est une fonction ayant les mêmes propriétés que if. Toute autre condition après un if\r\nest forcément elif.\r\n Rq : Il n’est pas obligé d’écrire elif à la place d’if, mais cela permet de structurer le texte.\r\n3) Else\r\nElse est une fonction traitant tout les autres cas possibles qui ne sont pas ceux du if.\r\nMêmes conditions d’affichage que pour if et elif.\r\n4) Comparaisons\r\nSymbole Signification\r\n== égal\r\n!= différent\r\n> plus grand\r\n< plus petit\r\n>= ≥\r\n<= ≤",
+            "slides": [
+                {
+                    "titre": "if ",
+                    "contenu": "If permet d'exécuter une action à une condition.\r\nSyntaxe : if condition:\r\n(4 espaces) action_a_executer",
+                    "code": "if age == 12:"
+                },
+                {
+                    "titre": "elif ",
+                    "contenu": "Elif effectue la même action qu'if. Même syntaxe. On l'utilise si le if énoncé plus haut est faux. On utilise jamais un elif sans qu'il y ait un if plus haut",
+                    "code": "elif reponse == \"Oui\":"
+                },
+                {
+                    "titre": "Else",
+                    "contenu": "Else traite tous les autres cas possibles. Même syntaxe qu'if sauf qu'il n'y a pas de condition. On utilise jamais d'else sans qu'il y ait de if plus haut",
+                    "code": "else:"
+                },
+                {
+                    "titre": "Comparaisons",
+                    "contenu": "signe                   Signification\r\n==                          égal à\r\n!=                           différent\r\n>                           plus grand\r\n<                           plus petit\r\n>=                           ≥\r\n<=                           ≤",
+                    "code": "if age == 12:"
+                },
+                {
+                    "titre": "Signes opératoires",
+                    "contenu": "Signe            Signification\r\n+                        plus\r\n-                         moins\r\n*                         fois\r\n/                          divisé\r\n**                      puissance\r\n%                       modulo (reste)",
+                    "code": ""
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quelle est la fonction qui permet de traiter tous les autres cas ?",
+                    "type": "qcm",
+                    "opts": [
+                        "if",
+                        "elif",
+                        "else"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel signe dit multiplication ?",
+                    "type": "qcm",
+                    "opts": [
+                        "/",
+                        "//",
+                        "x",
+                        "xx",
+                        "*"
+                    ],
+                    "r": "4",
+                    "is_python": false
+                },
+                {
+                    "q": "Avec quoi exprime t on un modulo ?",
+                    "type": "qcm",
+                    "opts": [
+                        "°",
+                        "+",
+                        "=",
+                        "-",
+                        "//",
+                        "%",
+                        "$"
+                    ],
+                    "r": "5",
+                    "is_python": false
+                },
+                {
+                    "q": "Avec quoi exprime t on une puissance ?",
+                    "type": "qcm",
+                    "opts": [
+                        "++",
+                        "xx",
+                        "x2",
+                        "**",
+                        "x="
+                    ],
+                    "r": "3",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel est le bon code ?",
+                    "type": "qcm",
+                    "opts": [
+                        "if 2 == nombre; print(\"OK\")",
+                        "else 2 == nombre; print(\"OK\")",
+                        "elif 2 == nombre: print(\"OK\")"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                }
+            ]
+        },
+        "conditionavancee": {
+            "titre": "3. Conditions avancées",
+            "matiere": "CODE",
+            "contenu": "1) And\r\nAnd se situe dans un if, et signifie que les conditions énoncées dans le if doivent être\r\nTOUTES vraies pour que le if soit exécuté.\r\nEx : if age = 12 and nom = \"Jules\" :\r\n(4 espaces) print(\"Tu t’appelle Jules et tu as 12 ans\")\r\n2) Or\r\nOr se situe dans un if, et signifie que si l’une des conditions énoncées dans le if est vraie,\r\npour que le if soit executé\r\nEx : if age > 12 or age < 60 :\r\n(4 espaces) print(\"Tarif réduit »)\r\n3) Not\r\nNot est la condition inverse à and : si quelque chose est faux, la condition est executée.\r\nEx : if not connecte :\r\n(4 espaces) print(\"Tu est déconnecté\")",
+            "slides": [
+                {
+                    "titre": "And",
+                    "contenu": "And ajoute dans un if une condition à une première",
+                    "code": "if age > and is_etudiant:"
+                },
+                {
+                    "titre": "Or",
+                    "contenu": "Or valide un if si une des conditions énoncée est vraie",
+                    "code": "if age <= 12 or age >= 60:"
+                },
+                {
+                    "titre": "Not",
+                    "contenu": "Not inverse une condition",
+                    "code": "if not vrai:"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quelle fonction permet d'inverser une condition ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "not",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction permet d'ajouter une condition à une première ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "and",
+                    "is_python": false
+                },
+                {
+                    "q": "RAPPEL : quelle fonction permet de diviser un nombre ?",
+                    "type": "qcm",
+                    "opts": [
+                        "/",
+                        "%",
+                        "//"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "RAPPEL : quelle fonction permet de transformer un nombre en texte",
+                    "type": "text",
+                    "opts": [],
+                    "r": "str",
+                    "is_python": false
+                },
+                {
+                    "q": "RAPPEL : Quelle est la différence entre = et == ?",
+                    "type": "qcm",
+                    "opts": [
+                        "= est le signe d'appartenance d'une variable et == est un signe de comparaison",
+                        " c'est l'inverse",
+                        " == introduit une valeur de variable qui ne change pas et == en introduit une qui change",
+                        " c'est l'inverse"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                }
+            ]
+        },
+        "boucles": {
+            "titre": "4. Boucles",
+            "matiere": "CODE",
+            "contenu": "1) while True\r\nwhile True insert une boucle infinie.\r\n Cette fonction est toujours suivie par « : »\r\nEx : while True:\r\n(4 espaces)print(\"Bonjour\")\r\n2) Break\r\nBreak est une fonction qui met fin à la boucle while True.\r\nEx : if reponse == \"oui\" :\r\n(4 espaces) break\r\n3) for\r\nfor est une fonction exécutant la même action pour chaque élément d'une liste ou d'une variable\r\nEx : noms = [\"Jules\", \"Louise\", \"Flore\"]\r\nfor i, nom in enumerate(i, noms):\r\n(4 espaces)print(i, noms)",
+            "slides": [
+                {
+                    "titre": "While True",
+                    "contenu": "while True insert une boucle infinie.\r\n Cette fonction est toujours suivie par « : »",
+                    "code": "while True: (4 espaces)print(\"Bonjour\")"
+                },
+                {
+                    "titre": "Break",
+                    "contenu": "Break arrête une boucle while True",
+                    "code": "if score == 10: break"
+                },
+                {
+                    "titre": "For",
+                    "contenu": "For est une fonction exécutant la même action plusieurs fois pour chaque élément d'une liste ou d'une variable",
+                    "code": "for i in range(10): # répète 10 fois la même chose"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quelle fonction introduit une boucle infinie",
+                    "type": "qcm",
+                    "opts": [
+                        "for",
+                        "while True",
+                        "while",
+                        "for in True"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Rajoutez le mot manquant : for nom ... range(nom)",
+                    "type": "text",
+                    "opts": [],
+                    "r": "in",
+                    "is_python": false
+                },
+                {
+                    "q": "RAPPEL : comment s'appelle cet ensemble ? age = 12",
+                    "type": "qcm",
+                    "opts": [
+                        "une boîte",
+                        "une variable",
+                        "une liste",
+                        "un contenu"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Donnez le nom d'une boucle qui exécute la même action pour chaque élément d'une liste.",
+                    "type": "text",
+                    "opts": [],
+                    "r": "for",
+                    "is_python": false
+                },
+                {
+                    "q": "Pourquoi while est suivi de True ?",
+                    "type": "qcm",
+                    "opts": [
+                        "Parce que la boucle ne s'exécute que si c'est vraie",
+                        "Parce qu'elle s'exécute autant de fois que la condition est vraie",
+                        "Parce que while est systématiquement suivie de Truei"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                }
+            ]
+        },
+        "definitions": {
+            "titre": "5. Définitions",
+            "matiere": "CODE",
+            "contenu": "1) def()\r\nDef est une fonction qui permet d’éviter les répétitions.\r\nIl se construit de la manière suivante :\r\ndef nom_de_la_def() :\r\n(4 espaces)print(\"Hello\")\r\nEx : def dire_bonjour():\r\n(4 espaces)print(\"Bonjour\")\r\ndire_bonjour()\r\ndire_bonjour()",
+            "slides": [
+                {
+                    "titre": "Définitions",
+                    "contenu": "Def est une fonction qui permet d’éviter les répétitions.\r\nIl se construit de la manière suivante :\r\ndef nom_de_la_def() :\r\n(4 espaces) action",
+                    "code": "def dire_bonjour():"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quel outil permet d'instaurer une définition ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "def",
+                    "is_python": false
+                },
+                {
+                    "q": "De quoi est il toujours suivi ?",
+                    "type": "qcm",
+                    "opts": [
+                        "de crochets []",
+                        " d'accolades {}",
+                        " de parenthèses ()"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "Qu'y a t il entre ce signe graphique et l'outil ?",
+                    "type": "qcm",
+                    "opts": [
+                        "le nom de la définition",
+                        " la condition d'exécution de la définition"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "A quoi servent les définitions ?",
+                    "type": "qcm",
+                    "opts": [
+                        "à créer un nouvel outil",
+                        " à créer un nouvel espace de stockage",
+                        " Autre"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Crée une fonction appellée dire_bonjour qui permet de dire bonjour, puis sert-en",
+                    "type": "text",
+                    "opts": [],
+                    "r": "bonjour",
+                    "is_python": true
+                }
+            ]
+        },
+        "eval1": {
+            "titre": "Evaluation de mi-parcours python",
+            "matiere": "CODE",
+            "contenu": "Ceci est une [HOTSPOT:évaluation:Elle regroupe toutes les données des cours 1 à 5.]. ",
+            "slides": [
+                {
+                    "titre": "EVALUATION",
+                    "contenu": "Ceci est une évaluation. Elle regroupe toutes les notions vues depuis les cours 1 à 5. ",
+                    "code": ""
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quelle fonction affiche quelque chose dans la console ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "print",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction permet d'enregistrer la réponse de l'utilisateur ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "input",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction permet de créer un outil ? (Définition)",
+                    "type": "text",
+                    "opts": [],
+                    "r": "def",
+                    "is_python": false
+                },
+                {
+                    "q": "Affiche bonjour dans la console ",
+                    "type": "qcm",
+                    "opts": [],
+                    "r": "bonjour",
+                    "is_python": true
+                },
+                {
+                    "q": "Qu'est ce qui ne va pas avec ce code ? : print(Bonjour à tous)",
+                    "type": "qcm",
+                    "opts": [
+                        "Il manque les guillemets",
+                        " Il manque le nom de la variable (question = )",
+                        " Autre",
+                        " Tout marche avec ce code "
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel signe exprime un reste",
+                    "type": "qcm",
+                    "opts": [
+                        "+",
+                        " -",
+                        " %",
+                        " x",
+                        " X",
+                        " *",
+                        " ^"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel signe est le signe d'appartenance d'une variable ?",
+                    "type": "qcm",
+                    "opts": [
+                        "=",
+                        " ==",
+                        " ==="
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel est le signe de comparaison signifie \"égal\" ?",
+                    "type": "qcm",
+                    "opts": [
+                        "=",
+                        " ==",
+                        " ==="
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel outil permet d'instaurer une boucle infinie ?",
+                    "type": "qcm",
+                    "opts": [
+                        "for",
+                        " while",
+                        " for True",
+                        " while True"
+                    ],
+                    "r": "3",
+                    "is_python": false
+                },
+                {
+                    "q": "Que fait ce code : question == input(\"Welcome\")",
+                    "type": "qcm",
+                    "opts": [
+                        " Il affiche Welcome",
+                        " Il affiche Welcome et enregistre la réponse de l'utilisateur",
+                        " Il affiche un message d'erreur"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "Donnez le nom d'une fonction qui permet de faire une boucle exécutant le même programme pour chaque élément d'une liste",
+                    "type": "text",
+                    "opts": [],
+                    "r": "for",
+                    "is_python": false
+                }
+            ]
+        },
+        "listes-1": {
+            "titre": "6. Listes partie 1",
+            "matiere": "CODE",
+            "contenu": "1) Listes\r\nUne liste est un endroit où Python peut stocker des valeurs.\r\nElle se construit de la manière suivante :\r\nnom_de_la_liste = []\r\n=> Ici on crée une liste vide (rien dans les [])\r\n.append()\r\n=> Cette fonction permet d’ajouter un nombre dans la liste\r\n.remove()\r\n=> Cette fonction retire de la liste l’objet entre parenthèses",
+            "slides": [
+                {
+                    "titre": "Listes",
+                    "contenu": "Une liste est une variable qui peut regrouper plusieurs données sous un même nom.\r\nSyntaxe : nom = [\"texte\", 12]",
+                    "code": "bons_codes = [\"ERR-12\", \"ERR-abC\", 13, 14]"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Les signes d'appartenance d'une variable et d'une liste sont les mêmes",
+                    "type": "qcm",
+                    "opts": [
+                        "Vrai",
+                        " Faux"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Comment introduit on une liste vide ?",
+                    "type": "qcm",
+                    "opts": [
+                        "Avec des [ ]",
+                        " Avec des { }",
+                        " Avec des ()"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Avec quoi rajoute on un élément dans la liste ?",
+                    "type": "qcm",
+                    "opts": [
+                        ".append()",
+                        " .remove()"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Que peut on ajouter dans une liste ?",
+                    "type": "qcm",
+                    "opts": [
+                        "Du texte",
+                        " Une valeur numérale",
+                        " Les deux"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "Créez une liste appelée Data avec le texte Magnifique ! ",
+                    "type": "text",
+                    "opts": [],
+                    "r": "Data = [\"Magnifique !\"]",
+                    "is_python": false
+                },
+                {
+                    "q": "RAPPEL : Quelle fonction permet d'énumérer les éléments d'une liste avec son index ? (ex: 33. Jules)",
+                    "type": "qcm",
+                    "opts": [
+                        "for",
+                        " range",
+                        " enumerate",
+                        " while"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "RAPPEL : quelle fonction exprime une condition ?",
+                    "type": "qcm",
+                    "opts": [
+                        "elif",
+                        " else",
+                        " so",
+                        " sif"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle est la bonne syntaxe ?",
+                    "type": "qcm",
+                    "opts": [
+                        "nom = [\"texte\" and \"nombre\"]",
+                        " nom = [\"texte\"]",
+                        " nom = [\"nombre\"]"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                }
+            ]
+        },
+        "listes2": {
+            "titre": "7. Listes et boucles avancées",
+            "matiere": "CODE",
+            "contenu": "1) Max() et min()\r\nPermet de donner le nombre de valeur maximum et minimum dans une suite de nombres.\r\nEx : print(max(3, 8, 2))\r\nprint(min(3, 8, 2))\r\n2) Sum()\r\nPermet d’additionner les nombres dans une suite de nombres.\r\nEx : notes = [10, 15, 12]\r\nprint(sum(notes))\r\n3) Round ()\r\nPermet d’arrondir un nombre.\r\nEx : print(round(3.7))\r\n4) Abs()\r\nDonne la distance à 0 d’un nombre.\r\nEx : print(abs(3.7))\r\n5) Range\r\nRange sert à générer une suite de nombre.\r\nRange est toujours suivi par le nombre entre parenthèse des chiffres générés.\r\nEx : for i in range(5): # i va de 0 à 4\r\nprint(i)\r\n6) Enumerate\r\nCombine une liste avec ses indices, utile pour afficher des options numérotées.\r\nEx : inventaire = [\"potion\", \"arc\", \"flèches\"]\r\nfor i, obj in enumerate(inventaire, 1): # commence à 1\r\nprint(i, obj)\r\n7) Split() et join()\r\nSplit() découpe une chaîne en une liste de mots\r\nJoin() transforme une liste en chaîne.\r\nEx : texte = \"Python est fun\"\r\nmots = texte.split() # ['Python', 'est', 'fun']\r\nprint(\" - \".join(mots)) # Python - est – fun\r\n8) Zip\r\nPermet de combiner plusieurs listes élément par élément\r\nEx : noms = [\"Alice\", \"Bob\"]\r\nscores = [10, 15]\r\nfor nom, score in zip(noms, scores):\r\nprint(f\"{nom} a {score} points\")\r\n9) Sorted\r\nTrie une liste sans modifier l’original.\r\nEx : notes = [15, 10, 20]\r\nprint(sorted(notes)) # [10, 15, 20]\r\n10) Reversed\r\nParcourt une liste ou une chaîne à l’envers.\r\nEx : mot = \"Python\"\r\nprint(\"\".join(reversed(mot))) # nohtyP",
+            "slides": [
+                {
+                    "titre": "Max() et min()",
+                    "contenu": "Max() et min() donnent la valeur la plus grande et la plus petite d'une liste.\r\nSyntaxe : max/min(nom_de_la_liste)",
+                    "code": "print(max(scores))"
+                },
+                {
+                    "titre": "Sum()",
+                    "contenu": "Sum() additionne les nombres d'une liste. Comme pour max et min, la liste ne doit contenir que des valeurs numérales.\r\nSyntaxe : sum(nom_de_la_liste)",
+                    "code": "reponse = input(sum(ages))"
+                },
+                {
+                    "titre": "Round et abs",
+                    "contenu": "round arrondit un nombre. Le nombre à arrondir est entre parenthèses\r\nabs donne la distance à zéro d'un nombre ",
+                    "code": "print(round(3.7))"
+                },
+                {
+                    "titre": "Range",
+                    "contenu": "Range génère une suite de nombres. Il est utilisé avec une boucle for pour répéter plusieurs fois la même action. \r\nSyntaxe : for nom in range(nombre_de_fois_que_for_sera_exécuté)",
+                    "code": "for i in range(5) # i va de 0 à 4"
+                },
+                {
+                    "titre": "Enumerate",
+                    "contenu": "Combine une liste avec ses indices, utile pour afficher des options numérotées.\r\nSyntaxe : for nom, nom2 in enumerate(nom_liste, nombre_de_début)",
+                    "code": "for i, obj in enumerate(inventaire, 1) # i commence à 1"
+                },
+                {
+                    "titre": "Split()",
+                    "contenu": "Split() découpe une chaîne en une liste de mots",
+                    "code": "mots = texte.split() # ['Python', 'est', 'fun']"
+                },
+                {
+                    "titre": "Join()",
+                    "contenu": "Join() transforme une liste en chaîne.",
+                    "code": "print(\" - \".join(mots)) # Python - est – fun "
+                },
+                {
+                    "titre": "zip",
+                    "contenu": "Permet de combiner plusieurs listes élément par élément.",
+                    "code": "for nom, score in zip(noms, scores):"
+                },
+                {
+                    "titre": "Sorted",
+                    "contenu": "Trie une liste sans modifier l’original.",
+                    "code": "print(sorted(notes)) # [10, 15, 20]"
+                },
+                {
+                    "titre": "Reversed",
+                    "contenu": "Parcourt une liste ou une chaîne à l’envers.",
+                    "code": "print(\"\".join(reversed(mot))) # nohtyP"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Laquelle des listes est correcte ?",
+                    "type": "qcm",
+                    "opts": [
+                        "nombres == [12 13 14]",
+                        " nombres = [12]",
+                        " nombres = {12; 13}"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction donne la valeur minimale d'une liste de nombres ?",
+                    "type": "qcm",
+                    "opts": [
+                        "mini",
+                        " min",
+                        " minimum"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction donne la valeur maximale d'une liste de nombres ?",
+                    "type": "qcm",
+                    "opts": [
+                        "maxi",
+                        " max",
+                        " maximum"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction permet d'additionner les nombres d'une liste ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "sum",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction génère une suite de nombres ?",
+                    "type": "text",
+                    "opts": [
+                        "for",
+                        " range",
+                        " while"
+                    ],
+                    "r": "range",
+                    "is_python": false
+                }
+            ]
+        },
+        "intro-bibli": {
+            "titre": "Introductions au bibliothèques",
+            "matiere": "CODE-BIBLIOTHEQUE",
+            "contenu": "Durant ce cours, vous allez apprendre ce que sont les bibliothèques",
+            "slides": [
+                {
+                    "titre": "Bibliothèques",
+                    "contenu": "Durant ce cours, vous allez apprendre ce que sont les bibliothèques",
+                    "code": ""
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Une bibliothèque Python est donc une collection de modules associés qui contient des paquets de codes réutilisables plusieurs fois dans divers programmes. Cette fonction simplifie la vie au développeur en rendant la programmation en Python plus simple et plus pratique.",
+                    "type": "qcm",
+                    "opts": [
+                        "Ok"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Vous allez utiliser les bibliothèques tkinter, flask, pygame, pandas, httpx, pydantic",
+                    "type": "qcm",
+                    "opts": [
+                        "Ok"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "1. Tkinter Tkinter permet de créer des interfaces graphiques ",
+                    "type": "qcm",
+                    "opts": [
+                        "Ok"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Que permet de faire tkinter ? De faire des :",
+                    "type": "qcm",
+                    "opts": [
+                        "sites web",
+                        " jeux vidéos",
+                        " de trier du code",
+                        " de faire des interfaces graphiques"
+                    ],
+                    "r": "3",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle bibliothèque permet de faire des interfaces graphiques ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "tkinter",
+                    "is_python": false
+                }
+            ]
+        },
+        "bibli-tkinter": {
+            "titre": "Introduction à tkinter",
+            "matiere": "CODE-BIBLIOTHEQUE",
+            "contenu": "Rappel : [FLOU:tkinter] est une fonction qui permet de créer des interfaces graphiques\r\n",
+            "slides": [
+                {
+                    "titre": "Tkinter",
+                    "contenu": "Tkinter est une bibliothèque qui permet de créer des interfaces graphiques. ",
+                    "code": ""
+                },
+                {
+                    "titre": "ETAPE 1 : Importer tkinter",
+                    "contenu": "Pour utiliser tkinter, on l'importe avec import tkinter. On l'utilise au début du script.\r\nPour éviter d'écrire tkinter tout le temps, on utilise as tk. On écrira tk à la place de tkinter.",
+                    "code": "import tkinter as tk"
+                },
+                {
+                    "titre": "ETAPE 2 : Créer une fenêtre",
+                    "contenu": "Pour créer une fenêtre, on utilise tk.Tk()\r\nSyntaxe : nom = tk.Tk()\r\nPour changer les dimentions d'une fenêtre, on utilise fenetre.config(\"300x400\")",
+                    "code": "fenetre = tk.Tk()"
+                },
+                {
+                    "titre": "Formules utiles",
+                    "contenu": "Pour afficher :\r\n- du texte, on utilise nom = tk.Label(text=\"texte\"). \r\n- un boutton, on utilise nom = tk.Button(text=\"texte\", command=def_a_activer_lors_du_clic)\r\nPour afficher le texte ou le bouton, on utilise nom.pack()",
+                    "code": "bouton = tk.Button(text=\"Clique ici !\", command=au_clic)"
+                },
+                {
+                    "titre": "ETAPE 3 : Forcer l'affichage continu",
+                    "contenu": "Pour forcer l'affichage continu de la fenêtre, on utilise nom_de_la_fenetre.mainloop()",
+                    "code": "fenetre.mainloop()"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quel module permet de créer des interfaces graphiques ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "tkinter",
+                    "is_python": false
+                },
+                {
+                    "q": "1. Importez tkintez ",
+                    "type": "text",
+                    "opts": [],
+                    "r": "import tkinter",
+                    "is_python": false
+                },
+                {
+                    "q": "2. Créez la fenêtre",
+                    "type": "qcm",
+                    "opts": [
+                        "fenetre.create(dimensions=\"300x400\")",
+                        " fenetre = tkinter.Tkinter()",
+                        " fenetre.create()",
+                        " fenetre = tkinter.Tkinter(dimensions=\"300x400\")"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "3. Configurez la fenêtre afin qu'elle fasse 300 pixels x 400 pixels",
+                    "type": "qcm",
+                    "opts": [
+                        "fenetre.configure(dimensions=\"300x400\")",
+                        " fenetre.config(\"300x400\")",
+                        " fenetre.configure(length=300",
+                        " height=400)"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle fonction créer un texte ?",
+                    "type": "qcm",
+                    "opts": [
+                        "text",
+                        " Label",
+                        " Text",
+                        " label",
+                        " Textarea",
+                        " textarea"
+                    ],
+                    "r": "1",
+                    "is_python": false
+                },
+                {
+                    "q": "Donnez la fonction qui crée un bouton",
+                    "type": "text",
+                    "opts": [],
+                    "r": "Button",
+                    "is_python": false
+                },
+                {
+                    "q": "A quoi sert as tk à la fin de l'importation ?",
+                    "type": "qcm",
+                    "opts": [
+                        "A faire un alias",
+                        " à ajouter un module complémentaire (ici tk)",
+                        " A ce que l'importation se passe correctement (gestion des erreurs)"
+                    ],
+                    "r": "0",
+                    "is_python": false
+                },
+                {
+                    "q": "Que doit on ABSOLUMENT mettre à la fon d'un script tkinter pour une fenetre appelée 'window' ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "window.mainloop()",
+                    "is_python": false
+                }
+            ]
+        },
+        "flask": {
+            "titre": "Flask : introduction",
+            "matiere": "CODE-BIBLIOTHEQUE",
+            "contenu": "",
+            "slides": [
+                {
+                    "titre": "Import",
+                    "contenu": "On a besoin d'importer le module flask",
+                    "code": "from flask import Flask"
+                },
+                {
+                    "titre": "flask name",
+                    "contenu": "On définit le \"nom\" de flask",
+                    "code": "app = Flask(__name__)"
+                },
+                {
+                    "titre": "Créer une route",
+                    "contenu": "Pour créer une route, on utilise l'écouteur @, pour le nom de flask (conventionnellement app) et .route ainsi que l'URL nom de la route entre parenthèses.",
+                    "code": "@app.route('/admin')"
+                },
+                {
+                    "titre": "Mettre une définition",
+                    "contenu": "Après la route, on utilise une définition.",
+                    "code": "def accueil()"
+                },
+                {
+                    "titre": "HTML",
+                    "contenu": "On renvoie du code HTML entre parenthèses.",
+                    "code": "return \"<h1>Bienvenue</h1>\""
+                },
+                {
+                    "titre": "Lancement ",
+                    "contenu": "On utilise .run()",
+                    "code": "app.run()"
+                }
+            ],
+            "exercices": [
+                {
+                    "q": "Quelle(s) bibliothèque(s) permet(tent) de créer des sites web ?",
+                    "type": "qcm",
+                    "opts": [
+                        "Flask",
+                        " Django",
+                        " Les deux"
+                    ],
+                    "r": "2",
+                    "is_python": false
+                },
+                {
+                    "q": "Quelle route est correcte ?",
+                    "type": "text",
+                    "opts": [
+                        "app.road()",
+                        " app.route(\"<h1>Bienvenue</h1>\")",
+                        " @app.route('admin)",
+                        " @admin.route('/admin')"
+                    ],
+                    "r": "3",
+                    "is_python": false
+                },
+                {
+                    "q": "Quel outil utilise t on après la route (la fonction python) ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "def",
+                    "is_python": false
+                },
+                {
+                    "q": "Comment lance t on le code avec le nom de flask app ?",
+                    "type": "text",
+                    "opts": [],
+                    "r": "app.run()",
+                    "is_python": false
+                }
+            ]
+        }
+    },
+    "users": {
+        "LearnCodePRO": {
+            "score": 175,
+            "notes": {
+                "bases": 100,
+                "condition": 100,
+                "conditionavancee": 100,
+                "boucles": 100,
+                "definitions": 100,
+                "eval1": 100,
+                "listes-1": 100
+            }
+        },
+        "Jules": {
+            "score": 600,
+            "notes": {
+                "bases": 100,
+                "condition": 100,
+                "conditionavancee": 100,
+                "boucles": 100
+            },
+            "pending_level_up": false
+        },
+        "Louise": {
+            "score": 231,
+            "notes": {
+                "bases": 67,
+                "condition": 80
+            },
+            "pending_level_up": false
+        },
+        "Gilles&Anne-Marie": {
+            "score": 125,
+            "notes": {
+                "bases": 100
+            },
+            "pending_level_up": false
+        },
+        "Pierre": {
+            "score": 200,
+            "notes": {
+                "bases": 83
+            },
+            "pending_level_up": false
+        },
+        "Flore": {
+            "score": 100,
+            "notes": {},
+            "pending_level_up": false
+        }
+    },
+    "devoirs": {
+        "dev_1782970124": {
+            "titre": "HTML - BASES",
+            "consigne": "Donnez le nom de la fonction qui affiche du texte, sans gras, ni italique.",
+            "rendus": {
+                "Jules": {
+                    "reponse": "<p>",
+                    "reponse_doc": null,
+                    "date": "02/07 07:29",
+                    "note": "20",
+                    "feedback": "Exactement !",
+                    "correction": "",
+                    "vu": true
+                }
+            },
+            "date": "02/07/2026",
+            "documents": [
+                "carte_1782938893"
+            ]
+        }
+    },
+    "cartes": {
+        "carte_1782938893": {
+            "titre": "Fonctions HTML",
+            "nodes": [
+                {
+                    "color": "#10b981",
+                    "id": "n1782938798423_0",
+                    "text": "Fonctions HTML",
+                    "x": 414,
+                    "y": 194
+                },
+                {
+                    "color": "#a855f7",
+                    "id": "n1782938860663_1",
+                    "text": "<p> : texte",
+                    "x": 160,
+                    "y": 130
+                }
+            ],
+            "edges": [
+                {
+                    "from": "n1782938860663_1",
+                    "to": "n1782938798423_0"
+                }
+            ],
+            "date": "02/07/2026"
+        }
+    },
+    "documents": {
+        "doc_1782938605": {
+            "titre": "HTML",
+            "contenu": "<b>HTML : Bases</b><div><b><br></b><div>Le HTML construit la page web.</div></div><div><br></div><div>Fonctions :&nbsp;</div><div>- &lt;h1&gt;Texte&lt;/h1&gt; : Titre</div><div>- &lt;p&gt;Texte&lt;/p&gt; : Texte</div>",
+            "date": "01/07/2026"
+        }
+    }
+}
