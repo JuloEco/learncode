@@ -630,30 +630,6 @@ LAYOUT = r"""
         {% endfor %}
     </div>
 
-    {% elif page == 'carte_editor' %}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <input id="carte-titre" value="{{ carte.titre }}" placeholder="Titre de la carte mentale" style="max-width: 420px; margin: 0;">
-        <div class="carte-toolbar">
-            <a href="/admin/cartes" class="btn btn-outline">← Retour</a>
-            <button class="btn btn-outline" type="button" onclick="addNode()">+ Nœud</button>
-            <button class="btn btn-primary" type="button" onclick="saveCarte()">💾 Enregistrer</button>
-        </div>
-    </div>
-    <div class="glass-card" style="padding: 0; overflow: hidden;">
-        <div class="carte-canvas-wrap" id="carte-canvas">
-            <svg id="carte-svg" style="position:absolute; top:0; left:0; width:3000px; height:2000px; pointer-events:none;"></svg>
-            <div id="nodes-layer" style="position:absolute; top:0; left:0; width:3000px; height:2000px;"></div>
-        </div>
-    </div>
-    <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 15px;">🎨 change la couleur • 🔗 relie deux nœuds (cliquer sur le 1er puis le 2e) • 🗑 supprime le nœud. Glissez les nœuds pour les déplacer.</p>
-    <script>
-        window.carteId = "{{ carte_id or '' }}";
-        window.carteNodes = {{ carte.nodes|tojson }};
-        window.carteEdges = {{ carte.edges|tojson }};
-        window.carteEditable = true;
-        window.addEventListener('load', function(){ renderCarte(); });
-    </script>
-
     {% elif page == 'admin_documents_list' %}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
         <h1 style="margin:0;">📄 Documents</h1>
@@ -879,26 +855,30 @@ LAYOUT = r"""
       {% elif page == 'projet' %}
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                   <div>
-                        <h1 style="font-size: 2.5rem; margin-bottom: 5px;">Sandbox Python</h1>
+                        <h1 style="font-size: 2.5rem; margin-bottom: 5px;">Sandbox</h1>
                         <p style="color: var(--text-dim);">Espace de développement libre. Votre code n'est pas sauvegardé à la fermeture.</p>
                   </div>
-                  <button class="btn btn-primary" onclick="runSandbox()">
-                        <span>▶</span> Exécuter le Projet
+                  <button class="btn btn-primary" id="sandbox-run-btn" onclick="runActiveSandbox()">
+                        <span>▶</span> Exécuter
                   </button>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+            <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                  <button type="button" class="btn btn-outline" id="tab-btn-python" onclick="switchSandboxTab('python')" style="border-color: var(--primary);">🐍 Python</button>
+                  <button type="button" class="btn btn-outline" id="tab-btn-web" onclick="switchSandboxTab('web')">🌐 HTML / CSS / JS</button>
+            </div>
+
+            <div id="sandbox-python-panel" style="display: grid; grid-template-columns: 1fr; gap: 20px;">
                   <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--primary);">
                         <div style="background: rgba(99, 102, 241, 0.1); padding: 10px 25px; border-bottom: 1px solid var(--border); font-size: 0.8rem; font-weight: 800; color: var(--primary);">
                               MAIN.PY
                         </div>
                         <textarea id="sandbox-editor" style="margin: 0; border: none; height: 450px; font-family: 'Fira Code', monospace; background: #020203; color: #7dd3fc; padding: 25px; resize: none;" spellcheck="false"># Bienvenue dans la Sandbox
 # Écrivez votre code Python librement ici
+# input() fonctionne aussi : une petite fenêtre de saisie s'ouvre !
 
-def salutation(nom):
-      return f"Bonjour {nom}, prêt à coder ?"
-
-print(salutation("Master"))
+nom = input("Quel est ton prénom ? ")
+print(f"Bonjour {nom}, prêt à coder ?")
 for i in range(5):
       print(f"Ligne de test n°{i+1}")
 </textarea>
@@ -907,10 +887,53 @@ for i in range(5):
                   <div class="glass-card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                               <h3 style="margin: 0; font-size: 1rem;">Console de sortie</h3>
+                              <div style="display:flex; gap:10px;">
                               <button class="btn btn-outline" style="padding: 5px 15px; font-size: 0.7rem;" onclick="document.getElementById('sandbox-console').innerText = 'Console nettoyée.'">Effacer</button>
                               <button class="btn btn-outline" style="padding: 5px 15px; font-size: 0.7rem;" onclick="navigator.clipboard.writeText(document.getElementById('sandbox-editor').value)">Copier le code</button>
+                              </div>
                         </div>
                         <div id="sandbox-console" style="background: #000; color: #fff; padding: 20px; border-radius: 16px; min-height: 150px; font-family: monospace; border-left: 4px solid var(--accent); white-space: pre-wrap;">Prêt pour l'exécution...</div>
+                  </div>
+            </div>
+
+            <div id="sandbox-web-panel" style="display: none; grid-template-columns: 1fr; gap: 20px;">
+                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--primary);">
+                              <div style="background: rgba(99, 102, 241, 0.1); padding: 10px 20px; border-bottom: 1px solid var(--border); font-size: 0.75rem; font-weight: 800; color: var(--primary);">HTML</div>
+                              <textarea id="web-editor-html" style="margin:0; border:none; height: 260px; font-family:'Fira Code', monospace; background:#020203; color:#f97316; padding:18px; resize: vertical;" spellcheck="false"><h1>Bonjour !</h1>
+<p>Modifie le HTML, le CSS et le JS puis clique sur Exécuter.</p>
+<button id="btn">Clique-moi</button></textarea>
+                        </div>
+                        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--primary);">
+                              <div style="background: rgba(99, 102, 241, 0.1); padding: 10px 20px; border-bottom: 1px solid var(--border); font-size: 0.75rem; font-weight: 800; color: var(--primary);">CSS</div>
+                              <textarea id="web-editor-css" style="margin:0; border:none; height: 260px; font-family:'Fira Code', monospace; background:#020203; color:#22d3ee; padding:18px; resize: vertical;" spellcheck="false">body {
+    font-family: sans-serif;
+    color: #222;
+    padding: 20px;
+}
+button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: #6366f1;
+    color: #fff;
+    cursor: pointer;
+}</textarea>
+                        </div>
+                        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--primary);">
+                              <div style="background: rgba(99, 102, 241, 0.1); padding: 10px 20px; border-bottom: 1px solid var(--border); font-size: 0.75rem; font-weight: 800; color: var(--primary);">JAVASCRIPT</div>
+                              <textarea id="web-editor-js" style="margin:0; border:none; height: 260px; font-family:'Fira Code', monospace; background:#020203; color:#a855f7; padding:18px; resize: vertical;" spellcheck="false">document.getElementById('btn').addEventListener('click', () => {
+    alert('Ça marche !');
+});</textarea>
+                        </div>
+                  </div>
+
+                  <div class="glass-card" style="padding: 0; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid var(--border);">
+                              <h3 style="margin: 0; font-size: 1rem;">Aperçu en direct</h3>
+                              <button class="btn btn-outline" style="padding: 5px 15px; font-size: 0.7rem;" onclick="runWebSandbox()">🔄 Rafraîchir</button>
+                        </div>
+                        <iframe id="web-preview" style="width:100%; height: 400px; border: none; background: #fff;"></iframe>
                   </div>
             </div>
       {% elif page == 'cours' %}
@@ -1422,6 +1445,7 @@ function changeSlide(direction) {
     window.addEventListener('DOMContentLoaded', () => {
         parseGenially();
         startPy();
+        if (document.getElementById('web-preview')) runWebSandbox();
     });
 
     // 3. SYSTÈME DE QUIZ ET SCORES
@@ -1514,12 +1538,61 @@ content = content.replace(/\[O\]([\s\S]*?)\[\/O\]/g, '<span style="color: #f39c1
 // On s'assure qu'il s'exécute bien une fois que la page est chargée
 window.addEventListener('load', parseCorrection);
     // 4. AUTRES FONCTIONS (Sandbox, Admin)
+
+    // --- SANDBOX : ONGLETS PYTHON / WEB ---
+    let sandboxActiveTab = 'python';
+    function switchSandboxTab(tab) {
+        sandboxActiveTab = tab;
+        const pyPanel = document.getElementById('sandbox-python-panel');
+        const webPanel = document.getElementById('sandbox-web-panel');
+        const btnPy = document.getElementById('tab-btn-python');
+        const btnWeb = document.getElementById('tab-btn-web');
+        if (!pyPanel || !webPanel) return;
+        pyPanel.style.display = (tab === 'python') ? 'grid' : 'none';
+        webPanel.style.display = (tab === 'web') ? 'grid' : 'none';
+        if (btnPy) btnPy.style.borderColor = (tab === 'python') ? 'var(--primary)' : 'var(--border)';
+        if (btnWeb) btnWeb.style.borderColor = (tab === 'web') ? 'var(--primary)' : 'var(--border)';
+        if (tab === 'web') runWebSandbox();
+    }
+
+    function runActiveSandbox() {
+        if (sandboxActiveTab === 'web') runWebSandbox();
+        else runSandbox();
+    }
+
+    // --- SANDBOX WEB : construit un document HTML/CSS/JS et l'affiche dans l'iframe ---
+    function runWebSandbox() {
+        const htmlBox = document.getElementById('web-editor-html');
+        const cssBox = document.getElementById('web-editor-css');
+        const jsBox = document.getElementById('web-editor-js');
+        const frame = document.getElementById('web-preview');
+        if (!htmlBox || !cssBox || !jsBox || !frame) return;
+        const doc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${cssBox.value}</style></head><body>${htmlBox.value}\n<script>\n${jsBox.value}\n<\/script></body></html>`;
+        frame.srcdoc = doc;
+    }
+
+    // --- Injecte un input() qui ouvre une fenêtre de saisie (window.prompt) au lieu de planter Pyodide ---
+    // Sans ça, le input() natif de Python essaie de lire une entrée standard qui n'existe pas dans le
+    // navigateur : ça lève une erreur (ou bloque) et casse toute l'exécution du script.
+    async function installInputShim() {
+        await py.runPythonAsync(`
+import builtins, js
+
+def _sandbox_input(prompt=''):
+    r = js.prompt(str(prompt))
+    return r if r is not None else ''
+
+builtins.input = _sandbox_input
+`);
+    }
+
     async function runSandbox() {
         const out = document.getElementById('sandbox-console');
         const code = document.getElementById('sandbox-editor').value;
         if (!py) { out.innerText = "Chargement..."; return; }
         await py.runPythonAsync("import sys, io\nsys.stdout = io.StringIO()");
         try {
+            await installInputShim();
             await py.runPythonAsync(code);
             out.innerText = (await py.runPythonAsync("sys.stdout.getvalue()")).trim() || "Terminé.";
         } catch(e) { out.innerText = "ERREUR :\n" + e; }
@@ -1530,6 +1603,7 @@ window.addEventListener('load', parseCorrection);
         if (!py) return;
         await py.runPythonAsync("import sys, io\nsys.stdout = io.StringIO()");
         try {
+            await installInputShim();
             await py.runPythonAsync(document.getElementById('code-editor').value);
             const res = (await py.runPythonAsync("sys.stdout.getvalue()")).trim();
             out.innerText = res; checkAns(res.toLowerCase() == val.toLowerCase());
@@ -1783,6 +1857,7 @@ async function runDevoirTests(did) {
     }
 
     out.innerHTML = '<p style="color:var(--text-dim);">⏳ Exécution des tests...</p>';
+    await installInputShim();
     let passed = 0;
     const results = [];
 
