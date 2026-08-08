@@ -2,14 +2,16 @@ from flask import Flask, render_template_string, request, jsonify, redirect, ses
 import json
 import os
 import ast
-import sqlite3
+import psycopg2
+import psycopg2.extras
 from datetime import datetime
+from functools import wraps
 import math
 
 
 
 app = Flask(__name__)
-app.secret_key = "learncode_PRO_v10_fixed"
+app.secret_key = os.environ.get("SECRET_KEY", "learncode_PRO_v10_fixed")
 
 def mini_editor_html(editor_id, content=""):
     """Génère le HTML du mini éditeur de texte enrichi (mini Word)."""
@@ -38,10 +40,20 @@ def mini_editor_html(editor_id, content=""):
 
 app.jinja_env.globals.update(enumerate_list=enumerate, mini_editor=mini_editor_html)
 
-# --- BASE DE DONNÉES (SQLite) ---
-DB_FILE = "learncode.db"
+# --- BASE DE DONNÉES (PostgreSQL / Render) ---
 LEGACY_JSON_FILE = "learncode_v6.json"  # ancien format, utilisé uniquement pour la migration automatique
 TABLES = ["cours", "users", "devoirs", "cartes", "documents"]
+
+# Sur Render, colle l'"Internal Database URL" (si l'app web tourne aussi sur Render,
+# dans la même région) ou l'"External Database URL" (accès depuis l'extérieur) dans
+# la variable d'environnement DATABASE_URL. Ne mets jamais l'URL en dur ici.
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+if DATABASE_URL and "sslmode" not in DATABASE_URL:
+    DATABASE_URL += ("&" if "?" in DATABASE_URL else "?") + "sslmode=require"
 
 def get_level_data(xp):
     # Formule : on monte de niveau tous les 100 XP (tu peux ajuster)
@@ -51,25 +63,24 @@ def get_level_data(xp):
     return {"lvl": level, "progress": progress, "next": 100}
 
 def get_conn():
-    """Ouvre une connexion SQLite. Le mode WAL autorise des lectures concurrentes
-    pendant une écriture et protège contre la corruption en cas de coupure."""
-    conn = sqlite3.connect(DB_FILE, timeout=10)
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA synchronous=NORMAL;")
-    return conn
+    """Ouvre une connexion PostgreSQL vers la base Render."""
+    if not DATABASE_URL:
+        raise RuntimeError("DATABASE_URL n'est pas défini (variable d'environnement manquante).")
+    return psycopg2.connect(DATABASE_URL)
 
 def init_db():
     conn = get_conn()
     try:
         with conn:
-            for t in TABLES:
-                conn.execute(f"""
-                    CREATE TABLE IF NOT EXISTS {t} (
-                        id TEXT PRIMARY KEY,
-                        data TEXT NOT NULL,
-                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
+            with conn.cursor() as cur:
+                for t in TABLES:
+                    cur.execute(f"""
+                        CREATE TABLE IF NOT EXISTS {t} (
+                            id TEXT PRIMARY KEY,
+                            data JSONB NOT NULL,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )
+                    """)
     finally:
         conn.close()
 
@@ -77,27 +88,36 @@ def _read_all():
     conn = get_conn()
     try:
         result = {}
-        for t in TABLES:
-            rows = conn.execute(f"SELECT id, data FROM {t}").fetchall()
-            result[t] = {rid: json.loads(data) for rid, data in rows}
+        with conn.cursor() as cur:
+            for t in TABLES:
+                cur.execute(f"SELECT id, data FROM {t}")
+                rows = cur.fetchall()
+                # psycopg2 désérialise déjà les colonnes JSONB en dict Python
+                result[t] = {rid: data for rid, data in rows}
         return result
     finally:
         conn.close()
 
 def _write_all(data):
     """Réécrit intégralement chaque table dans une seule transaction atomique :
-    soit tout est enregistré, soit rien ne l'est (jamais de fichier à moitié écrit)."""
+    soit tout est enregistré, soit rien ne l'est (rollback automatique en cas d'erreur)."""
     conn = get_conn()
     try:
         with conn:
-            for t in TABLES:
-                conn.execute(f"DELETE FROM {t}")
-                rows = [
-                    (rid, json.dumps(val, ensure_ascii=False), datetime.now().isoformat())
-                    for rid, val in data.get(t, {}).items()
-                ]
-                if rows:
-                    conn.executemany(f"INSERT INTO {t} (id, data, updated_at) VALUES (?, ?, ?)", rows)
+            with conn.cursor() as cur:
+                for t in TABLES:
+                    cur.execute(f"DELETE FROM {t}")
+                    rows = [
+                        (rid, json.dumps(val, ensure_ascii=False))
+                        for rid, val in data.get(t, {}).items()
+                    ]
+                    if rows:
+                        psycopg2.extras.execute_values(
+                            cur,
+                            f"INSERT INTO {t} (id, data) VALUES %s",
+                            rows,
+                            template="(%s, %s::jsonb)"
+                        )
     finally:
         conn.close()
 
@@ -106,7 +126,7 @@ def load_db():
     result = _read_all()
 
     # Migration automatique et unique depuis l'ancien fichier JSON (learncode_v6.json)
-    # si la base SQLite est encore vide et que l'ancien fichier existe.
+    # si la base Postgres est encore vide et que l'ancien fichier existe.
     if not any(result.values()) and os.path.exists(LEGACY_JSON_FILE):
         try:
             with open(LEGACY_JSON_FILE, "r", encoding="utf-8") as f:
@@ -114,7 +134,7 @@ def load_db():
             for t in TABLES:
                 result[t] = legacy.get(t, {})
             _write_all(result)
-            print(f"✅ Migration automatique : {LEGACY_JSON_FILE} → {DB_FILE}")
+            print(f"✅ Migration automatique : {LEGACY_JSON_FILE} → PostgreSQL")
         except Exception as e:
             print(f"⚠️ Migration depuis {LEGACY_JSON_FILE} impossible : {e}")
 
@@ -145,6 +165,37 @@ def save_db():
     })
 
 
+# --- SÉCURITÉ : décorateurs de vérification de session ---
+# Remplace les checks manuels "if session.get('user') != 'LearnCodePRO': ..."
+# dupliqués dans chaque route (et donc facilement oubliables sur une nouvelle
+# route future). Centralisé ici une bonne fois pour toutes.
+
+def login_required(view_func):
+    """Bloque l'accès si personne n'est connecté."""
+    @wraps(view_func)
+    def wrapped(*args, **kwargs):
+        if "user" not in session:
+            return redirect(url_for('index'))
+        return view_func(*args, **kwargs)
+    return wrapped
+
+def admin_required(view_func=None, *, json_response=False):
+    """Bloque l'accès si l'utilisateur connecté n'est pas l'administrateur.
+    Usage : @admin_required                (redirige vers / si refusé)
+            @admin_required(json_response=True)  (renvoie du JSON 403, pour les routes API)
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            if session.get("user") != "LearnCodePRO":
+                if json_response:
+                    return jsonify(ok=False, error="Accès refusé : réservé à l'administrateur."), 403
+                return redirect(url_for('index'))
+            return func(*args, **kwargs)
+        return wrapped
+    if view_func is not None:
+        return decorator(view_func)
+    return decorator
 
 
 
@@ -1823,13 +1874,6 @@ def login():
         return redirect(url_for('dashboard'))
     return redirect(url_for('index'))
 
-# @app.before_request
-# def restrict_admin():
-#    if request.path.startswith("/admin") and session.get("user") != "LearnCodePRO":
-#        return redirect("/")
-    
-
-
 @app.route("/logout")
 def logout(): session.clear(); return redirect("/")
 
@@ -1868,9 +1912,10 @@ def dashboard():
     # ... reste du code ...
     return render_template_string(LAYOUT, page='dashboard', user_data=ud, 
                                  categories=cats, lvl=lvl_data, notifs=notifs)
+
 @app.route("/admin/devoirs/creer", methods=["POST"])
+@admin_required
 def admin_creer_devoir():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     titre = request.form.get("titre")
     consigne_form = request.form.get("consigne", "Pas de consigne spécifiée.")
     did = "dev_" + str(hash(titre + str(datetime.now())))[:8] # ID unique
@@ -2014,25 +2059,20 @@ def stats_view():
 def view_projet(): return render_template_string(LAYOUT, page='projet')
 
 @app.route("/admin")
+@admin_required
 def admin_dashboard():
-    # Vérifie si c'est bien l'admin qui est connecté
-    if session.get("user") != "LearnCodePRO": 
-        return redirect("/")
-    
     # On affiche la page admin avec la liste des cours et des devoirs
     return render_template_string(LAYOUT, page='admin_list', cours_dict=COURS, DEVOIRS=DEVOIRS, USERS=USERS)
 
 @app.route("/admin/new")
+@admin_required
 def admin_new():
-      if session.get("user") != "LearnCodePRO": return redirect("/")
       return render_template_string(LAYOUT, page='admin_edit', edit_mode=False, cours_to_edit={"exercices":[]})
+
 @app.route("/admin/edit/<id_c>")
+@admin_required
 def admin_edit(id_c):
-    # 1. Vérification de sécurité (Admin uniquement)
-    if session.get("user") != "LearnCodePRO": 
-        return redirect("/")
-    
-    # 2. On cherche le cours dans notre dictionnaire COURS
+    # On cherche le cours dans notre dictionnaire COURS
     # Si id_c n'existe pas (cas d'un nouveau cours), on crée une structure vide
     cours = COURS.get(id_c, {
         "titre": "", 
@@ -2042,7 +2082,7 @@ def admin_edit(id_c):
         "slides": []
     })
     
-    # 3. On affiche la page 'admin_edit' du LAYOUT
+    # On affiche la page 'admin_edit' du LAYOUT
     return render_template_string(
         LAYOUT, 
         page='admin_edit', 
@@ -2051,10 +2091,10 @@ def admin_edit(id_c):
         cours_to_edit=cours,
         cours_dict=COURS # Nécessaire pour afficher la liste sur le côté si besoin
     )
+
 @app.route("/admin/save", methods=["POST"])
+@admin_required
 def admin_save():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
-    
     cid = request.form.get("id")
     if not cid: return redirect("/admin")
 
@@ -2119,24 +2159,24 @@ def voir_carte(cid):
     return render_template_string(LAYOUT, page='carte_view', carte=carte, carte_id=cid)
 
 @app.route("/admin/cartes")
+@admin_required
 def admin_cartes_list():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     return render_template_string(LAYOUT, page='admin_cartes_list', cartes=CARTES)
 
 @app.route("/admin/cartes/new")
+@admin_required
 def admin_cartes_new():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     return render_template_string(LAYOUT, page='carte_editor', carte={"titre": "", "nodes": [], "edges": []}, carte_id="")
 
 @app.route("/admin/cartes/edit/<cid>")
+@admin_required
 def admin_cartes_edit(cid):
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     carte = CARTES.get(cid, {"titre": "", "nodes": [], "edges": []})
     return render_template_string(LAYOUT, page='carte_editor', carte=carte, carte_id=cid)
 
 @app.route("/admin/cartes/save", methods=["POST"])
+@admin_required(json_response=True)
 def admin_cartes_save():
-    if session.get("user") != "LearnCodePRO": return jsonify(ok=False), 403
     data = request.get_json(force=True, silent=True) or {}
     cid = data.get("id") or f"carte_{int(datetime.now().timestamp())}"
     CARTES[cid] = {
@@ -2149,8 +2189,8 @@ def admin_cartes_save():
     return jsonify(ok=True, id=cid)
 
 @app.route("/admin/cartes/delete/<cid>")
+@admin_required
 def admin_cartes_delete(cid):
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     CARTES.pop(cid, None)
     save_db()
     return redirect("/admin/cartes")
@@ -2165,24 +2205,24 @@ def voir_document(did):
     return render_template_string(LAYOUT, page='doc_view', doc=doc)
 
 @app.route("/admin/documents")
+@admin_required
 def admin_documents_list():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     return render_template_string(LAYOUT, page='admin_documents_list', documents=DOCUMENTS)
 
 @app.route("/admin/documents/new")
+@admin_required
 def admin_documents_new():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     return render_template_string(LAYOUT, page='doc_editor', doc={"titre": "", "contenu": ""}, doc_id="")
 
 @app.route("/admin/documents/edit/<did>")
+@admin_required
 def admin_documents_edit(did):
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     doc = DOCUMENTS.get(did, {"titre": "", "contenu": ""})
     return render_template_string(LAYOUT, page='doc_editor', doc=doc, doc_id=did)
 
 @app.route("/admin/documents/save", methods=["POST"])
+@admin_required
 def admin_documents_save():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     did = request.form.get("id") or f"doc_{int(datetime.now().timestamp())}"
     DOCUMENTS[did] = {
         "titre": request.form.get("titre", "Sans titre"),
@@ -2193,23 +2233,21 @@ def admin_documents_save():
     return redirect("/admin/documents")
 
 @app.route("/admin/documents/delete/<did>")
+@admin_required
 def admin_documents_delete(did):
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     DOCUMENTS.pop(did, None)
     save_db()
     return redirect("/admin/documents")
 
 
 @app.route("/casier")
+@admin_required
 def admin_casier():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     return render_template_string(LAYOUT, page='admin_casier', devoirs=DEVOIRS, USERS=USERS, documents=DOCUMENTS, cartes=CARTES)
 
 @app.route("/casier/nouveau", methods=["POST"])
+@admin_required
 def nouveau_devoir():
-    if session.get("user") != "LearnCodePRO": 
-        return redirect("/")
-    
     # 1. On crée l'ID unique
     did = f"dev_{int(datetime.now().timestamp())}"
     
@@ -2249,8 +2287,8 @@ def nouveau_devoir():
     return redirect("/casier")
 
 @app.route("/casier/corriger/<did>/<student>", methods=["POST"])
+@admin_required
 def corriger_devoir(did, student):
-    if session.get("user") != "LearnCodePRO": return redirect("/")
     note = request.form.get("note")
     feedback = request.form.get("feedback")
     DEVOIRS[did]["rendus"][student].update({
@@ -2325,17 +2363,15 @@ def consulter_corrige(id_d):
     return render_template_string(LAYOUT, page='voir_devoir', user=u, devoir=devoir, id_d=id_d, USERS=USERS, notifs=notifs, CARTES=CARTES, DOCUMENTS=DOCUMENTS)
 
 @app.route("/admin/delete/<cid>")
+@admin_required
 def admin_delete(cid):
-      if session.get("user") == "LearnCodePRO": COURS.pop(cid, None); save_db()
+      COURS.pop(cid, None)
+      save_db()
       return redirect("/admin")
-# ROUTE 1 : Créer le devoir vide
 
-
-# ROUTE 2 : Noter et Corriger
 @app.route("/admin/casier/noter", methods=["POST"])
+@admin_required
 def admin_noter():
-    if session.get("user") != "LearnCodePRO": return redirect("/")
-    
     did = request.form.get("did")
     user_eleve = request.form.get("eleve")
     note_val = request.form.get("note")
@@ -2362,7 +2398,7 @@ def admin_noter():
         rendu.update({"note": note_val, "feedback": request.form.get("feedback"), "correction": request.form.get("correction"), "vu": False})
         save_db()
     return redirect(url_for('admin_casier'))
-        # --------------------------------
+
 @app.route("/clear_level_up")
 def clear_level_up():
     u = session.get("user")
@@ -2370,6 +2406,7 @@ def clear_level_up():
         USERS[u]["pending_level_up"] = False
         save_db()
     return jsonify(ok=True)
+
 @app.route("/resultat/<id_c>/<int:score>")
 def view_resultat(id_c, score):
     if "user" not in session: return redirect("/")
@@ -2386,4 +2423,6 @@ def view_resultat(id_c, score):
 
 
 if __name__ == "__main__":
-      app.run(debug=True, port=5003)
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
