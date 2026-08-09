@@ -630,6 +630,30 @@ LAYOUT = r"""
         {% endfor %}
     </div>
 
+    {% elif page == 'carte_editor' %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <input id="carte-titre" value="{{ carte.titre }}" placeholder="Titre de la carte mentale" style="max-width: 420px; margin: 0;">
+        <div class="carte-toolbar">
+            <a href="/admin/cartes" class="btn btn-outline">← Retour</a>
+            <button class="btn btn-outline" type="button" onclick="addNode()">+ Nœud</button>
+            <button class="btn btn-primary" type="button" onclick="saveCarte()">💾 Enregistrer</button>
+        </div>
+    </div>
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <div class="carte-canvas-wrap" id="carte-canvas">
+            <svg id="carte-svg" style="position:absolute; top:0; left:0; width:3000px; height:2000px; pointer-events:none;"></svg>
+            <div id="nodes-layer" style="position:absolute; top:0; left:0; width:3000px; height:2000px;"></div>
+        </div>
+    </div>
+    <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 15px;">🎨 change la couleur • 🔗 relie deux nœuds (cliquer sur le 1er puis le 2e) • 🗑 supprime le nœud. Glissez les nœuds pour les déplacer.</p>
+    <script>
+        window.carteId = "{{ carte_id or '' }}";
+        window.carteNodes = {{ carte.nodes|tojson }};
+        window.carteEdges = {{ carte.edges|tojson }};
+        window.carteEditable = true;
+        window.addEventListener('load', function(){ renderCarte(); });
+    </script>
+
     {% elif page == 'admin_documents_list' %}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
         <h1 style="margin:0;">📄 Documents</h1>
