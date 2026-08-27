@@ -1,7 +1,8 @@
-from flask import Flask, render_template_string, request, jsonify, redirect, session, url_for
+from flask import Flask, render_template_string, request, jsonify, redirect, session, url_for, flash
 import json
 import os
 import ast
+import requests
 import psycopg2
 import psycopg2.extras
 from datetime import datetime
@@ -12,6 +13,23 @@ import math
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "learncode_PRO_v10_fixed")
+
+# ----------------------------------------------------
+# OCTIX — service d'authentification centralisé
+# ----------------------------------------------------
+OCTIX_URL = os.environ.get("OCTIX_URL", "http://localhost:5050")
+OCTIX_PORTAL_URL = os.environ.get("OCTIX_PORTAL_URL", "http://localhost:5051")
+
+
+def octix_login(username, password):
+    """Vérifie les identifiants auprès d'Octix. Retourne (ok, token_ou_message)."""
+    try:
+        r = requests.post(f"{OCTIX_URL}/login", json={"username": username, "password": password}, timeout=5)
+        if r.status_code == 200:
+            return True, r.json()["token"]
+        return False, "Pseudo ou mot de passe incorrect."
+    except requests.exceptions.RequestException:
+        return False, "Le service Octix est injoignable. Réessaie plus tard."
 
 def mini_editor_html(editor_id, content=""):
     """Génère le HTML du mini éditeur de texte enrichi (mini Word)."""
@@ -629,30 +647,6 @@ LAYOUT = r"""
             <p style="color: var(--text-dim);">Aucune carte pour le moment. Créez-en une !</p>
         {% endfor %}
     </div>
-
-    {% elif page == 'carte_editor' %}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <input id="carte-titre" value="{{ carte.titre }}" placeholder="Titre de la carte mentale" style="max-width: 420px; margin: 0;">
-        <div class="carte-toolbar">
-            <a href="/admin/cartes" class="btn btn-outline">← Retour</a>
-            <button class="btn btn-outline" type="button" onclick="addNode()">+ Nœud</button>
-            <button class="btn btn-primary" type="button" onclick="saveCarte()">💾 Enregistrer</button>
-        </div>
-    </div>
-    <div class="glass-card" style="padding: 0; overflow: hidden;">
-        <div class="carte-canvas-wrap" id="carte-canvas">
-            <svg id="carte-svg" style="position:absolute; top:0; left:0; width:3000px; height:2000px; pointer-events:none;"></svg>
-            <div id="nodes-layer" style="position:absolute; top:0; left:0; width:3000px; height:2000px;"></div>
-        </div>
-    </div>
-    <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 15px;">🎨 change la couleur • 🔗 relie deux nœuds (cliquer sur le 1er puis le 2e) • 🗑 supprime le nœud. Glissez les nœuds pour les déplacer.</p>
-    <script>
-        window.carteId = "{{ carte_id or '' }}";
-        window.carteNodes = {{ carte.nodes|tojson }};
-        window.carteEdges = {{ carte.edges|tojson }};
-        window.carteEditable = true;
-        window.addEventListener('load', function(){ renderCarte(); });
-    </script>
 
     {% elif page == 'admin_documents_list' %}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
@@ -1435,10 +1429,28 @@ function changeSlide(direction) {
 {% elif page == 'login' %}
             <div class="glass-card" style="max-width: 450px; margin: 100px auto; text-align: center; padding: 50px;">
                   <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Accès LEARNCODE</h1>
+
+                  <div style="display:flex; align-items:center; justify-content:center; gap:8px; background: rgba(120,180,255,0.08); border: 1px solid rgba(120,180,255,0.25); border-radius: 10px; padding: 10px 14px; margin-bottom: 24px; font-size: 0.82rem; opacity: 0.9;">
+                        🔒 Connexion via <b>Octix</b> — même pseudo, même mot de passe sur toutes tes apps Axiom.
+                  </div>
+
+                  {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                      <div style="background: rgba(255,80,80,0.15); border: 1px solid rgba(255,80,80,0.4); color: #ff9b9b; border-radius: 10px; padding: 12px; margin-bottom: 20px; font-size: 0.9rem;">
+                        {{ messages[0] }}
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+
                   <form action="/login" method="post">
                         <input name="username" placeholder="Pseudo" required style="text-align: center;">
-                        <button class="btn btn-primary" style="width: 100%;">Commencer</button>
+                        <input name="password" type="password" placeholder="Mot de passe" required style="text-align: center; margin-top: 10px;">
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;">Se connecter</button>
                   </form>
+
+                  <p style="margin-top: 20px; font-size: 0.85rem; opacity: 0.8;">
+                        Pas encore de compte ? <a href="{{ octix_portal_url }}" target="_blank" rel="noopener">Crée ton identifiant Octix ↗</a>
+                  </p>
             </div>
       {% endif %}
 </div>
@@ -1935,7 +1947,7 @@ async function runDevoirTests(did) {
 def index():
     if "user" in session:
         return redirect(url_for('dashboard'))
-    return render_template_string(LAYOUT, page='login')
+    return render_template_string(LAYOUT, page='login', octix_portal_url=OCTIX_PORTAL_URL)
 
 @app.route("/quiz/<id_c>/<int:index>")
 def view_quiz(id_c, index):
@@ -1965,13 +1977,22 @@ def view_quiz(id_c, index):
 @app.route("/login", methods=["POST"])
 def login():
     u = request.form.get("username", "").strip()
-    if u:
-        session["user"] = u
-        if u not in USERS:
-            USERS[u] = {"score": 0, "notes": {}}
-        save_db()
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('index'))
+    p = request.form.get("password", "")
+    if not u or not p:
+        flash("Merci de renseigner ton pseudo et ton mot de passe.")
+        return redirect(url_for('index'))
+
+    ok, result = octix_login(u, p)
+    if not ok:
+        flash(result)
+        return redirect(url_for('index'))
+
+    session["user"] = u
+    session["octix_token"] = result
+    if u not in USERS:
+        USERS[u] = {"score": 0, "notes": {}}
+    save_db()
+    return redirect(url_for('dashboard'))
 
 @app.route("/logout")
 def logout(): session.clear(); return redirect("/")
