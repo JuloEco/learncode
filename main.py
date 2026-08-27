@@ -1430,8 +1430,9 @@ function changeSlide(direction) {
             <div class="glass-card" style="max-width: 450px; margin: 100px auto; text-align: center; padding: 50px;">
                   <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Accès LEARNCODE</h1>
 
-                  <div style="display:flex; align-items:center; justify-content:center; gap:8px; background: rgba(120,180,255,0.08); border: 1px solid rgba(120,180,255,0.25); border-radius: 10px; padding: 10px 14px; margin-bottom: 24px; font-size: 0.82rem; opacity: 0.9;">
-                        🔒 Connexion via <b>Octix</b> — même pseudo, même mot de passe sur toutes tes apps Axiom.
+                  <div style="display:flex; align-items:flex-start; gap:10px; text-align:left; background: rgba(79,195,222,0.08); border: 1px solid rgba(79,195,222,0.28); border-radius: 10px; padding: 12px 16px; margin-bottom: 24px; font-size: 0.82rem; line-height: 1.5; opacity: 0.9;">
+                        <span style="flex-shrink:0;">🔒</span>
+                        <span>Connexion via <b>Octix</b> — même pseudo, même mot de passe sur toutes tes apps Axiom.</span>
                   </div>
 
                   {% with messages = get_flashed_messages() %}
