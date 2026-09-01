@@ -1450,7 +1450,7 @@ function changeSlide(direction) {
                   </form>
 
                   <p style="margin-top: 20px; font-size: 0.85rem; opacity: 0.8;">
-                        Pas encore de compte ? <a href="{{ octix_portal_url }}" target="_blank" rel="noopener" style="text-decoration: None; color: '#25B9CF'">Crée ton identifiant Octix ↗</a>
+                        Pas encore de compte ? <a href="{{ octix_portal_url }}" target="_blank" rel="noopener" style="text-decoration: None; color: #25B9CF;">Crée ton identifiant Octix ↗</a>
                   </p>
             </div>
       {% endif %}
